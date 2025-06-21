@@ -12,20 +12,10 @@ import {
 
 async function Home() {
   const user = await getCurrentUser();
-  
-  if (!user?.id) {
-    return (
-      <section className="flex items-center justify-center h-[60vh]">
-        <p className="text-lg text-muted-foreground">
-          You must be logged in to view this page.
-        </p>
-      </section>
-    );
-  }
 
   const [userInterviews, allInterview] = await Promise.all([
-    getInterviewsByUserId(user.id),
-    getLatestInterviews({ userId: user.id }),
+    getInterviewsByUserId(user?.id!),
+    getLatestInterviews({ userId: user?.id! }),
   ]);
 
   const hasPastInterviews = userInterviews?.length! > 0;
