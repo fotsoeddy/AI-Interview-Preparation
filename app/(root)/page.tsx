@@ -24,13 +24,13 @@ async function Home() {
 
   return (
     <div className="relative">
-      {user && (
+      {/* {user && (
   <form action={signOutAction} className="absolute top-0 right-0 mt-4 mr-4">
     <Button type="submit" variant="outline">
       Logout
     </Button>
   </form>
-)}
+)} */}
 
       <section className="card-cta">
         <div className="flex flex-col gap-6 max-w-lg">
