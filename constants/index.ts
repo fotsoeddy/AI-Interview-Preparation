@@ -3,6 +3,7 @@ import { z } from "zod";
 
 export const mappings = {
   "react.js": "react",
+  reacct: "react",
   reactjs: "react",
   react: "react",
   "next.js": "nextjs",

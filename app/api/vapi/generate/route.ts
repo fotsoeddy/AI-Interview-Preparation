@@ -10,27 +10,40 @@ export async function POST(request: Request) {
   try {
     const { text: questions } = await generateText({
       model: google("gemini-2.0-flash-001"),
-      prompt: `Prepare questions for a job interview.
-        The job role is ${role}.
-        The job experience level is ${level}.
-        The tech stack used in the job is: ${techstack}.
-        The focus between behavioural and technical questions should lean towards: ${type}.
-        The amount of questions required is: ${amount}.
-        Please return only the questions, without any additional text.
-        The questions are going to be read by a voice assistant so do not use "/" or "*" or any other special characters which might break the voice assistant.
-        Return the questions formatted like this:
-        ["Question 1", "Question 2", "Question 3"]
-        
-        Thank you! <3
-    `,
+      prompt: `You are an AI assistant helping prepare a structured set of questions for a job interview.
+
+Job Role: ${role}
+Experience Level: ${level}
+Technology Stack: ${techstack}
+Focus: ${type} (behavioral or technical)
+Number of Questions: ${amount}
+
+Please generate a concise list of high-quality interview questions aligned with the role, level, and technologies mentioned. The questions should be strictly focused on the indicated type.
+
+Important:
+- Return only the questions in a valid JSON array format like: ["Question 1", "Question 2", "Question 3"]
+- Avoid any special characters such as "/", "*", etc., as the questions will be read by a voice assistant.
+- Do not include any additional commentary or explanation—only the question strings inside the array.
+
+Thank you.`,
     });
 
+    // Clean any markdown code fences (like ```json ... ```) before parsing
+    const cleanQuestions = questions
+      .trim()
+      .replace(/^```json/, '')
+      .replace(/^```/, '')      // In case no "json" label, just ```
+      .replace(/```$/, '')
+      .trim();
+
+    const parsedQuestions = JSON.parse(cleanQuestions);
+
     const interview = {
-      role: role,
-      type: type,
-      level: level,
+      role,
+      type,
+      level,
       techstack: techstack.split(","),
-      questions: JSON.parse(questions),
+      questions: parsedQuestions,
       userId: userid,
       finalized: true,
       coverImage: getRandomInterviewCover(),
@@ -42,7 +55,7 @@ export async function POST(request: Request) {
     return Response.json({ success: true }, { status: 200 });
   } catch (error) {
     console.error("Error:", error);
-    return Response.json({ success: false, error: error }, { status: 500 });
+    return Response.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 500 });
   }
 }
 

@@ -1,14 +1,15 @@
 import Link from "next/link";
 import Image from "next/image";
-
-import { Button } from "@/components/ui/button";
-import InterviewCard from "@/components/InterviewCard";
-
-import { getCurrentUser } from "@/lib/actions/auth.action";
+import {  getCurrentUser } from "@/lib/actions/auth.action";
+import { signOut as signOutAction } from "@/lib/actions/auth.action";
 import {
   getInterviewsByUserId,
   getLatestInterviews,
 } from "@/lib/actions/general.action";
+
+import { Button } from "@/components/ui/button";
+import InterviewCardWrapper from "@/components/InterviewCardWrapper";
+
 
 async function Home() {
   const user = await getCurrentUser();
@@ -22,7 +23,15 @@ async function Home() {
   const hasUpcomingInterviews = allInterview?.length! > 0;
 
   return (
-    <>
+    <div className="relative">
+      {user && (
+  <form action={signOutAction} className="absolute top-0 right-0 mt-4 mr-4">
+    <Button type="submit" variant="outline">
+      Logout
+    </Button>
+  </form>
+)}
+
       <section className="card-cta">
         <div className="flex flex-col gap-6 max-w-lg">
           <h2>Get Interview-Ready with AI-Powered Practice & Feedback</h2>
@@ -45,49 +54,50 @@ async function Home() {
       </section>
 
       <section className="flex flex-col gap-6 mt-8">
-        <h2>Your Interviews</h2>
+  <h2>Your Interviews</h2>
 
-        <div className="interviews-section">
-          {hasPastInterviews ? (
-            userInterviews?.map((interview) => (
-              <InterviewCard
-                key={interview.id}
-                userId={user?.id}
-                interviewId={interview.id}
-                role={interview.role}
-                type={interview.type}
-                techstack={interview.techstack}
-                createdAt={interview.createdAt}
-              />
-            ))
-          ) : (
-            <p>You haven&apos;t taken any interviews yet</p>
-          )}
-        </div>
-      </section>
+  <div className="interviews-section">
+    {hasPastInterviews ? (
+      userInterviews?.map((interview) => (
+        <InterviewCardWrapper
+          key={interview.id}
+          userId={user?.id}
+          interviewId={interview.id}
+          role={interview.role}
+          type={interview.type}
+          techstack={interview.techstack}
+          createdAt={interview.createdAt}
+        />
+      ))
+    ) : (
+      <p>You haven&apos;t taken any interviews yet</p>
+    )}
+  </div>
+</section>
 
-      <section className="flex flex-col gap-6 mt-8">
-        <h2>Take Interviews</h2>
+<section className="flex flex-col gap-6 mt-8">
+  <h2>Take Interviews</h2>
 
-        <div className="interviews-section">
-          {hasUpcomingInterviews ? (
-            allInterview?.map((interview) => (
-              <InterviewCard
-                key={interview.id}
-                userId={user?.id}
-                interviewId={interview.id}
-                role={interview.role}
-                type={interview.type}
-                techstack={interview.techstack}
-                createdAt={interview.createdAt}
-              />
-            ))
-          ) : (
-            <p>There are no interviews available</p>
-          )}
-        </div>
-      </section>
-    </>
+  <div className="interviews-section">
+    {hasUpcomingInterviews ? (
+      allInterview?.map((interview) => (
+        <InterviewCardWrapper
+          key={interview.id}
+          userId={user?.id}
+          interviewId={interview.id}
+          role={interview.role}
+          type={interview.type}
+          techstack={interview.techstack}
+          createdAt={interview.createdAt}
+        />
+      ))
+    ) : (
+      <p>There are no interviews available</p>
+    )}
+  </div>
+</section>
+
+    </div>
   );
 }
 

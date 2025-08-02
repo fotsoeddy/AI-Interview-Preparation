@@ -1,9 +1,17 @@
 import Image from "next/image";
-
 import { cn, getTechLogos } from "@/lib/utils";
 
+interface TechIconProps {
+  techStack: string[];
+}
+
 const DisplayTechIcons = async ({ techStack }: TechIconProps) => {
+  console.log("Tech stack received:", techStack); // Debug log
   const techIcons = await getTechLogos(techStack);
+
+  if (!techIcons.length) {
+    return <p className="text-sm text-gray-500">No tech icons available</p>;
+  }
 
   return (
     <div className="flex flex-row">
@@ -16,13 +24,17 @@ const DisplayTechIcons = async ({ techStack }: TechIconProps) => {
           )}
         >
           <span className="tech-tooltip">{tech}</span>
-
           <Image
             src={url}
             alt={tech}
-            width={100}
-            height={100}
-            className="size-5"
+            width={24}
+            height={24}
+            className="size-6"
+            onError={(e) => {
+              console.error(`Failed to load icon for ${tech}: ${url}`);
+              e.currentTarget.src =
+                "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/devicon/devicon-original.svg"; // CDN fallback
+            }}
           />
         </div>
       ))}
